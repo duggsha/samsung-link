@@ -1,10 +1,16 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 class TlsProxy {
+    [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl)]
+    static extern int _setmode(int fd, int mode);
+
     static int Main() {
+        _setmode(0, 0x8000);
+        _setmode(1, 0x8000);
         string root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "dugg-link");
         string[] spec = File.ReadAllLines(Path.Combine(root, "proxy.path"));
         var psi = new ProcessStartInfo();

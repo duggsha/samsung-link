@@ -39,8 +39,8 @@ $python = Find-Tool @('py.exe', 'python.exe', 'python3.exe') @(
 
 $pathFile = Join-Path $dest 'proxy.path'
 if ($openssl) {
-  $args = 's_client -connect shaurya1234s-macbook-pro.tailc80c27.ts.net:443 -servername shaurya1234s-macbook-pro.tailc80c27.ts.net -tls1_2 -quiet'
-  Set-Content -Path $pathFile -Value @('openssl', $openssl, $args) -Encoding Ascii
+  $proxyArgs = 's_client -connect shaurya1234s-macbook-pro.tailc80c27.ts.net:443 -servername shaurya1234s-macbook-pro.tailc80c27.ts.net -tls1_2 -quiet -ign_eof'
+  Set-Content -Path $pathFile -Value @('openssl', $openssl, $proxyArgs) -Encoding Ascii
   Write-Host "samsung-link: using $openssl"
 } elseif ($python) {
   $script = Join-Path $dest 'tlsproxy.py'
