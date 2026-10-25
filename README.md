@@ -2,7 +2,7 @@
 
 Visible link from Shaurya's Samsung laptop to his Mac.
 
-The laptop opens an outbound SSH connection to the Mac. The Mac can then SSH back through that connection to the laptop's existing OpenSSH server. The window stays on screen. Closing it stops the link.
+The laptop opens an outbound SSH connection to the Mac on port 443. That port is TLS in front of SSH. The Mac can then SSH back through that connection to the laptop's existing OpenSSH server. The window stays on screen. Closing it stops the link.
 
 No private key is in this repo. `install.ps1` creates one on the laptop and prints the public key.
 
