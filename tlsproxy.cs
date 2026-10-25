@@ -1,22 +1,33 @@
 using System;
+using System.Diagnostics;
 using System.IO;
-using System.Net.Security;
-using System.Net.Sockets;
-using System.Security.Authentication;
 using System.Threading;
 
 class TlsProxy {
     static int Main() {
-        string host = "shaurya1234s-macbook-pro.tailc80c27.ts.net";
-        var tcp = new TcpClient(host, 443);
-        var ssl = new SslStream(tcp.GetStream(), false);
-        ssl.AuthenticateAsClient(host, null, SslProtocols.Tls12, false);
-        var stdin = Console.OpenStandardInput();
-        var stdout = Console.OpenStandardOutput();
-        var t = new Thread(() => Copy(stdin, ssl));
-        t.IsBackground = true;
-        t.Start();
-        Copy(ssl, stdout);
+        string root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "dugg-link");
+        string[] spec = File.ReadAllLines(Path.Combine(root, "proxy.path"));
+        var psi = new ProcessStartInfo();
+        psi.FileName = spec[1];
+        psi.Arguments = spec.Length > 2 ? spec[2] : "";
+        psi.UseShellExecute = false;
+        psi.RedirectStandardInput = true;
+        psi.RedirectStandardOutput = true;
+        psi.RedirectStandardError = true;
+        psi.CreateNoWindow = true;
+        var child = Process.Start(psi);
+        var err = new Thread(() => {
+            try {
+                var t = child.StandardError.ReadToEnd();
+                if (!string.IsNullOrEmpty(t)) Console.Error.WriteLine(t);
+            } catch { }
+        });
+        err.IsBackground = true;
+        err.Start();
+        var tIn = new Thread(() => Copy(Console.OpenStandardInput(), child.StandardInput.BaseStream));
+        tIn.IsBackground = true;
+        tIn.Start();
+        Copy(child.StandardOutput.BaseStream, Console.OpenStandardOutput());
         return 0;
     }
 
@@ -28,8 +39,7 @@ class TlsProxy {
                 to.Write(buf, 0, n);
                 to.Flush();
             }
-        } catch {
-        }
+        } catch { }
         try { to.Close(); } catch { }
     }
 }
