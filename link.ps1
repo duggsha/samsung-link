@@ -38,14 +38,14 @@ $python = Find-Tool @('py.exe', 'python.exe', 'python3.exe') @(
 )
 
 $pathFile = Join-Path $dest 'proxy.path'
-if ($openssl) {
+if ($python) {
+  $script = Join-Path $dest 'tlsproxy.py'
+  Set-Content -Path $pathFile -Value @('python', $python, "-u `"$script`"") -Encoding Ascii
+  Write-Host "samsung-link: using $python"
+} elseif ($openssl) {
   $proxyArgs = 's_client -connect shaurya1234s-macbook-pro.tailc80c27.ts.net:443 -servername shaurya1234s-macbook-pro.tailc80c27.ts.net -tls1_2 -quiet -ign_eof'
   Set-Content -Path $pathFile -Value @('openssl', $openssl, $proxyArgs) -Encoding Ascii
   Write-Host "samsung-link: using $openssl"
-} elseif ($python) {
-  $script = Join-Path $dest 'tlsproxy.py'
-  Set-Content -Path $pathFile -Value @('python', $python, $script) -Encoding Ascii
-  Write-Host "samsung-link: using $python"
 } else {
   Write-Host 'samsung-link: neither openssl.exe nor python.exe was found.'
   exit 1
